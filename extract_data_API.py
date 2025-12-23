@@ -8,7 +8,7 @@ currencies = ['usd','eur','mxn']
 parametros = {
     'ids' : ','.join(cryptos),
     'names' : cryptos ,
-    'vs_currencies' : currencies,
+    'vs_currencies' : ','.join(currencies),
     'include_market_cap': 'true',
     'include_24hr_change' : 'true',
     'include_last_updated_at' : 'true'
