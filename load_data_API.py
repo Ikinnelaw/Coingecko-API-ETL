@@ -29,7 +29,7 @@ def crear_base_datos():
                 nombre VARCHAR(50) NOT NULL,
                 precio_usd DECIMAL(20, 2),
                 precio_mxn DECIMAL(20, 2),
-                precio_eur DECIMAL(20, 2)
+                precio_eur DECIMAL(20, 2),
                 market_cap_usd BIGINT,
                 market_cap_mxn BIGINT,
                 market_cap_eur BIGINT,
@@ -42,7 +42,7 @@ def crear_base_datos():
                 timestamp DATETIME,
                 INDEX idx_nombre (nombre),
                 INDEX idx_timestamp (timestamp)
-            )
+            ) 
         """)
         
         conn.commit()
@@ -84,7 +84,7 @@ def cargar_datos_crypto(df):
                 (nombre, precio_usd, precio_mxn,precio_eur, market_cap_usd,market_cap_mxn , market_cap_eur, 
                 volumen_24h_usd, volumen_24h_mxn , volumen_24h_eur , cambio_24h_usd, cambio_24h_mxn,
                         cambio_24h_eur, timestamp)
-                VALUES (%s, %s, %s,%s , %s, %s, %s, %s, %s,  %s, %s,%s, %s %s)
+                VALUES (%s, %s, %s, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s ,%s)
             """, (
                 row['nombre'],
                 float(row['precio_usd']),
