@@ -1,11 +1,14 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime , timezone
 from extract_data_API import extract_data
+import logging
 
-def transform_data(datos_json):
+logger = logging.getLogger(__name__)
 
-    if not datos_json: 
-        print(f"No hay datos para transformar")
+def transform_prices(prices_json):
+
+    if not prices_json: 
+        logger.info(f"No hay datos para transformar")
         return None
 
     # Se crea una lista con los diccionarios del registro 
@@ -13,7 +16,7 @@ def transform_data(datos_json):
 
     #crypto_name NOmbre de la moneda bitcoin, ethereum, etc
     #crypto_data = Toda la información de esa moneda 
-    for crypto_name, crypto_data in datos_json.items():
+    for crypto_name, crypto_data in prices_json.items():
         try:
             registro = {
                 'nombre': crypto_name,
@@ -35,27 +38,216 @@ def transform_data(datos_json):
 
 
         except Exception as e:
-            print(f"Error al procesar los datos de la criptomoneda {crypto_name}: {e}")
+            logger.error(f"Error al procesar los datos de la criptomoneda {crypto_name}: {e}")
             continue  # Continúa con el siguiente registro en caso de error
     
     try:
         # Crear DataFrame
-        df = pd.DataFrame(registros)
+        dataframe = pd.DataFrame(registros)
 
         # Redondear números
-        df['precio_usd'] = df['precio_usd'].round(2)
-        df['precio_mxn'] = df['precio_mxn'].round(2)
-        df['precio_eur'] = df['precio_eur'].round(2)
-        df['cambio_24h_usd'] = df['cambio_24h_usd'].round(2)
-        df['cambio_24h_mxn'] = df['cambio_24h_mxn'].round(2)
-        df['cambio_24h_eur'] = df['cambio_24h_eur'].round(2)
+        dataframe['precio_usd'] = dataframe['precio_usd'].round(2)
+        dataframe['precio_mxn'] = dataframe['precio_mxn'].round(2)
+        dataframe['precio_eur'] = dataframe['precio_eur'].round(2)
+        dataframe['cambio_24h_usd'] = dataframe['cambio_24h_usd'].round(2)
+        dataframe['cambio_24h_mxn'] = dataframe['cambio_24h_mxn'].round(2)
+        dataframe['cambio_24h_eur'] = dataframe['cambio_24h_eur'].round(2)
     
     except Exception as e:
-        print(f"Error al crear el DataFrame: {e}")
+        logger.error(f"Error al crear el DataFrame: {e}")
         return None
 
-    return df
+    return dataframe
 
-datos = extract_data()
-df = transform_data(datos)
-#print(df)
+
+def transform_details(details_json):
+
+    if not details_json:
+        logger.info("No hay datos para transformar en details")
+        return None
+
+    registros = []
+
+    try:
+        for crypto_id, data in details_json.items():
+            registro = {
+                "crypto_id": crypto_id,
+                "name": data.get("name"),
+                "symbol": data.get("symbol"),
+                "categories": ",".join(data.get("categories", [])),
+                "hashing_algorithm": data.get("hashing_algorithm"),
+                "genesis_date": data.get("genesis_date"),
+                "country_origin": data.get("country_origin"),
+            }
+
+            registros.append(registro)
+
+        dataframe = pd.DataFrame(registros)
+        return dataframe
+
+    except Exception as e:
+        logger.error(f"Error transformando details: {e}")
+        return None
+
+
+#Transformar data para el dataframe de exchange 
+def transform_exchanges(exchanges_json):
+    # Verificar si los datos de exchanges están vacíos
+    if not exchanges_json:
+        logger.info("No hay datos para transformar para el exchange.")
+        return None
+
+    registros = []  # Lista para almacenar los registros
+
+    for crypto_id, data in exchanges_json.items():
+        for ticker in data.get("tickers", []):
+            try:
+                registro = {
+                    "crypto_id": crypto_id,
+                    "exchange": ticker["market"]["name"],
+                    "base": ticker.get("base"),
+                    "target": ticker.get("target"),
+                    "last_price": ticker.get("last"),
+                    "volume": ticker.get("volume"),
+                    "timestamp": datetime.now(timezone.utc)
+                }
+                registros.append(registro)
+
+            except KeyError as e:
+                logger.error(f"Faltó una clave en {crypto_id}: {e}")
+                continue
+    if not registros:  # Si no se crearon registros, retornar None
+        logger.info("No se pudieron crear registros para el exchange.")
+        return None
+    
+    try:
+        # Intentar crear el DataFrame con los registros
+        dataframe = pd.DataFrame(registros)
+    except Exception as e:
+        logger.error(f"Error al crear el DataFrame para el exchange: {e}")
+        return None
+
+    return dataframe
+
+
+#Funcion para extraer el market historico 
+
+def transform_market_history(market_json):
+
+    if not market_json:
+        logger.info("No hay datos para transformar del market history.")
+        return None
+
+    registros = []
+
+    for crypto_id, prices_list in market_json.items():
+
+        for price in prices_list:
+            try:
+                registro = {
+                    "crypto_id": crypto_id,
+                    "price_usd": price["price_usd"],
+                    "timestamp": datetime.fromtimestamp(
+                        price["timestamp"] / 1000,
+                        tz=timezone.utc
+                    )
+                }
+
+                registros.append(registro)
+
+            except (IndexError, TypeError) as e:
+                logger.error(
+                    f"Error procesando market history de {crypto_id}: {e}"
+                )
+                continue
+
+    if not registros:
+        logger.info("No se pudieron crear registros para market history.")
+        return None
+
+    try:
+        dataframe = pd.DataFrame(registros)
+        return dataframe
+
+    except Exception as e:
+        logger.error(f"Error al crear DataFrame de market history: {e}")
+        return None
+
+
+#Funcion para extraer las monedas mas populares en su df 
+def transform_trending(trending_json):
+
+    if not trending_json:
+        logger.info("No se transformaron registros para el trending json ")
+        return None
+    
+    registros = []
+
+    for item in trending_json.get("coins", []):
+        coin = item["item"]
+        try:
+            registro = ({
+                "crypto_id": coin["id"],
+                "name": coin["name"],
+                "symbol": coin["symbol"],
+                "market_cap_rank": coin.get("market_cap_rank"),
+                "timestamp": datetime.utcnow()
+            })
+            registros.append(registro)
+        
+        except KeyError as e:
+            logger.error(f"Faltó una clave en el coin: {e} - {coin}")
+            continue  # Si falta alguna clave, saltar al siguiente ticker
+
+
+    if not registros:  # Si no se crearon registros, retornar None
+        logger.info("No se pudieron crear registros para el trending.")
+        return None
+    
+    try:
+        # Intentar crear el DataFrame con los registros
+        dataframe = pd.DataFrame(registros)
+    except Exception as e:
+        logger.error(f"Error al crear el DataFrame para el trending: {e}")
+        return None
+
+    return dataframe
+
+
+
+def transform_global_market(global_json):
+    try:
+        # Obtener los datos del JSON
+        data = global_json.get("data", {})
+        
+        # Crear el registro único con los datos
+        registro = {
+            "total_market_cap_usd": data.get("total_market_cap", {}).get("usd"),
+            "total_volume_usd": data.get("total_volume", {}).get("usd"),
+            "btc_dominance": data.get("market_cap_percentage", {}).get("btc"),
+            "active_cryptocurrencies": data.get("active_cryptocurrencies"),
+            "timestamp": datetime.now(timezone.utc)
+        }
+
+        # Retornar el DataFrame con un solo registro
+        return pd.DataFrame([registro])  # No necesitamos una lista de registros, solo pasamos el registro
+
+    except KeyError as e:
+        logger.error(f"Falta una clave al procesar global market data: {e}")
+        return None  # Retornar None en caso de error
+
+    except Exception as e:
+        logger.error(f"Error inesperado al procesar global market data: {e}")
+        return None  # Retornar None en caso de error inesperado
+
+raw_data = extract_data()
+
+df_prices = transform_prices(raw_data["prices"])
+df_details = transform_details(raw_data["details"])
+df_exchanges = transform_exchanges(raw_data["exchanges"])
+df_market = transform_market_history(raw_data["market_history"])
+df_trending = transform_trending(raw_data["trending"])
+df_global = transform_global_market(raw_data["global_market"])
+
+print(df_market)
+print(type(df_market))
