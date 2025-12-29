@@ -44,9 +44,9 @@ def get_prices():
             #print(f"Datos obtenidos: {len(simple_data)} criptomonedas")
             #print(f"Cryptos: {list(simple_data.keys())}")
             #print("Precios de las criptomonedas:", simple_data)
-            logger.info("Extraccion de Información de Precios")
+            logger.info("Extraccion de Informacion de Precios")
 
-            time.sleep(25) # delay de 20 seg 
+            time.sleep(60) # delay de 20 seg 
             return simple_data
         else:
             print(f"Error en la API de precios: {response_price.status_code}")
@@ -67,7 +67,7 @@ def get_details():
             if response.status_code == 200:
                 resultados[crypto] = response.json()
                 print(f"JSON para {crypto}: {resultados[crypto]}")
-                logger.info("Extraccion de Información para Detalles")
+                logger.info("Extraccion de Informacion para Detalles")
 
             elif response.status_code == 429:
                 logger.warning(f"Rate limit alcanzado para {crypto}")
@@ -75,7 +75,7 @@ def get_details():
             else:
                 logger.error(f"Error {response.status_code} para {crypto}")
 
-            time.sleep(20)  # nos esperamos 20 seg
+            time.sleep(40)  # nos esperamos 20 seg
 
         return resultados if resultados else None 
             
@@ -118,7 +118,7 @@ def get_exchanges():
                 resultados[crypto] = data
 
                 #print(f"JSON para {crypto}: {resultados[crypto]}")
-                logger.info("Extraccion de Información para ex changes")
+                logger.info("Extraccion de Informacion para ex changes")
             else:
                 logger.error(f"Error {response.status_code} para {crypto}")
 
@@ -162,7 +162,7 @@ def get_market_history():
                 #print(f"JSON para {crypto}: {resultados[crypto]}")
                 #print(f"{crypto} → precios cargados: {contador}")
 
-                logger.info("Extraccion de Información para el market history")
+                logger.info("Extraccion de Informacion para el market history")
             
             
             elif response_market.status_code == 429:
@@ -189,14 +189,14 @@ def get_trending():
         if response_trending.status_code == 200:
             trending_data = response_trending.json()
             trending_coins = trending_data['coins'][:10]
-            print("\nTop 10 criptomonedas en tendencia:")
+            #print("\nTop 10 criptomonedas en tendencia:")
             position = 1
             for crypto in trending_coins:
                 coin = crypto['item']  # Información de la criptomoneda
-                print(f"Posición: {position}")
-                print(f"Nombre: {coin['name']}")
-                print(f"Símbolo: {coin['symbol']}")
-                print(f"ID: {coin['id']}")
+                #print(f"Posición: {position}")
+                #print(f"Nombre: {coin['name']}")
+                #print(f"Símbolo: {coin['symbol']}")
+                #print(f"ID: {coin['id']}")
                 position += 1
 
             time.sleep(10)  # Delay después de obtener trending
@@ -206,7 +206,7 @@ def get_trending():
     except requests.exceptions.Timeout:
         logger.error("Error: La solicitud ha superado el tiempo de espera")
     except Exception as e:
-        logger.error(f"Ocurrió un error inesperado: {e}")
+        logger.error(f"Ocurrio un error inesperado: {e}")
 
 
 
