@@ -108,12 +108,14 @@ def ejecutar_pipeline():
             logger.info(f" Trending cargado: {registros} registros")
         else:
             logger.warning(" No hay datos de trending para cargar")
-            
+
         print("\n" + "="*60)
         print(" PIPELINE COMPLETADO EXITOSAMENTE")
+        logger.info(" PIPELINE COMPLETADO EXITOSAMENTE")
         print("="*60)
         print(f" Fin: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        
+        logger.info(f" Fin: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        logger.info("\n Fin de la ejecucion \n\n")
     except Exception as e:
         logger.error(f" ERROR CRÍTICO: {e}")
         import traceback

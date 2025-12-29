@@ -195,7 +195,7 @@ def transform_trending(trending_json):
             registros.append(registro)
         
         except KeyError as e:
-            logger.error(f"Faltó una clave en el coin: {e} - {coin}")
+            logger.error(f"Falto una clave en el coin: {e} - {coin}")
             continue  # Si falta alguna clave, saltar al siguiente ticker
 
 
