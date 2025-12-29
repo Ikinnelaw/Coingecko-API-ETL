@@ -75,9 +75,8 @@ def transform_details(details_json):
                 "name": data.get("name"),
                 "symbol": data.get("symbol"),
                 "categories": ",".join(data.get("categories", [])),
-                "hashing_algorithm": data.get("hashing_algorithm"),
-                "genesis_date": data.get("genesis_date"),
-                "country_origin": data.get("country_origin"),
+                "asset_platform_id": data.get("asset_platform_id"),
+                "market_cap_rank": data.get("market_cap_rank"),
             }
 
             registros.append(registro)
@@ -214,40 +213,15 @@ def transform_trending(trending_json):
     return dataframe
 
 
+#Logs para probar que funcionan
+#raw_data = extract_data()
 
-def transform_global_market(global_json):
-    try:
-        # Obtener los datos del JSON
-        data = global_json.get("data", {})
-        
-        # Crear el registro único con los datos
-        registro = {
-            "total_market_cap_usd": data.get("total_market_cap", {}).get("usd"),
-            "total_volume_usd": data.get("total_volume", {}).get("usd"),
-            "btc_dominance": data.get("market_cap_percentage", {}).get("btc"),
-            "active_cryptocurrencies": data.get("active_cryptocurrencies"),
-            "timestamp": datetime.now(timezone.utc)
-        }
+#df_prices = transform_prices(raw_data["prices"])
+#df_details = transform_details(raw_data["details"])
+#df_exchanges = transform_exchanges(raw_data["exchanges"])
+#df_market = transform_market_history(raw_data["market_history"])
+#df_trending = transform_trending(raw_data["trending"])
+#df_global = transform_global_market(raw_data["global_market"])
 
-        # Retornar el DataFrame con un solo registro
-        return pd.DataFrame([registro])  # No necesitamos una lista de registros, solo pasamos el registro
-
-    except KeyError as e:
-        logger.error(f"Falta una clave al procesar global market data: {e}")
-        return None  # Retornar None en caso de error
-
-    except Exception as e:
-        logger.error(f"Error inesperado al procesar global market data: {e}")
-        return None  # Retornar None en caso de error inesperado
-
-raw_data = extract_data()
-
-df_prices = transform_prices(raw_data["prices"])
-df_details = transform_details(raw_data["details"])
-df_exchanges = transform_exchanges(raw_data["exchanges"])
-df_market = transform_market_history(raw_data["market_history"])
-df_trending = transform_trending(raw_data["trending"])
-df_global = transform_global_market(raw_data["global_market"])
-
-print(df_market)
-print(type(df_market))
+#print(df_market)
+#print(type(df_market))
