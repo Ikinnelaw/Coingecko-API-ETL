@@ -1,0 +1,27 @@
+2025-12-29 17:29:30,186 - INFO - Creando base de datos y tablas...
+2025-12-29 17:29:30,650 - INFO - Base de datos 'crypto_tracker' lista
+2025-12-29 17:29:30,650 - INFO - Tabla 'precios_crypto' creada
+2025-12-29 17:29:30,654 - INFO - FASE 1/3: Extraccion de API
+2025-12-29 17:29:31,810 - WARNING - Rate limit alcanzado para bitcoin
+2025-12-29 17:30:07,690 - INFO - Extraccion de Información para Detalles
+2025-12-29 17:30:43,085 - INFO - Extraccion de Información para Detalles
+2025-12-29 17:31:18,584 - INFO - Extraccion de Información para ex changes
+2025-12-29 17:31:33,813 - INFO - Extraccion de Información para ex changes
+2025-12-29 17:31:50,087 - INFO - Extraccion de Información para ex changes
+2025-12-29 17:32:05,348 - INFO - Extraccion de Información para el market history
+2025-12-29 17:32:06,015 - INFO - Extraccion de Información para el market history
+2025-12-29 17:32:06,222 - INFO - Extraccion de Información para el market history
+2025-12-29 17:32:16,433 - INFO - FASE 2/3: Transformacion
+2025-12-29 17:32:16,434 - INFO - No hay datos para transformar
+2025-12-29 17:32:16,461 - INFO - FASE 3/3: Carga a Base de Datos
+2025-12-29 17:32:16,462 - INFO - FASE 3/3: Carga a Base de Datos
+2025-12-29 17:32:16,463 - INFO -  Insertados 3 registros 
+2025-12-29 17:32:16,463 - INFO - Precios cargados: 3 registros
+2025-12-29 17:32:16,849 - INFO - Insertados 2 registros de details
+2025-12-29 17:32:16,852 - INFO -  Details cargados: 2 registros
+2025-12-29 17:32:17,027 - INFO - Insertados 15 registros de exchanges
+2025-12-29 17:32:17,031 - INFO -  Exchanges cargados: 15 registros
+2025-12-29 17:32:17,256 - INFO - Insertados 15 registros de market history
+2025-12-29 17:32:17,259 - INFO -  Market history cargado: 15 registros
+2025-12-29 17:32:17,491 - INFO - Insertados 15 registros de trending
+2025-12-29 17:32:17,496 - INFO -  Trending cargado: 15 registros
