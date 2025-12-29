@@ -12,6 +12,7 @@ cryptos = ['bitcoin', 'ethereum', 'tether']
 currencies = ['usd','eur','mxn']
 HEADERS = {"accept": "application/json"}
 
+# parametros para obtenerl los precios 
 parametros = {
     'ids' : ','.join(cryptos),
     'vs_currencies' : ','.join(currencies),
@@ -40,10 +41,12 @@ def get_prices():
         
         if response_price.status_code == 200:
             simple_data = response_price.json()
-            print(f"Datos obtenidos: {len(simple_data)} criptomonedas")
-            print(f"Cryptos: {list(simple_data.keys())}")
-            print("Precios de las criptomonedas:", simple_data)
+            #print(f"Datos obtenidos: {len(simple_data)} criptomonedas")
+            #print(f"Cryptos: {list(simple_data.keys())}")
+            #print("Precios de las criptomonedas:", simple_data)
+            logger.info("Extraccion de Información de Precios")
 
+            time.sleep(25) # delay de 20 seg 
             return simple_data
         else:
             print(f"Error en la API de precios: {response_price.status_code}")
@@ -63,7 +66,8 @@ def get_details():
 
             if response.status_code == 200:
                 resultados[crypto] = response.json()
-                #print(f"JSON para {crypto}: {resultados[crypto]}")
+                print(f"JSON para {crypto}: {resultados[crypto]}")
+                logger.info("Extraccion de Información para Detalles")
 
             elif response.status_code == 429:
                 logger.warning(f"Rate limit alcanzado para {crypto}")
@@ -71,7 +75,7 @@ def get_details():
             else:
                 logger.error(f"Error {response.status_code} para {crypto}")
 
-            time.sleep(1.5)  # nos esperamos un minuto
+            time.sleep(20)  # nos esperamos 20 seg
 
         return resultados if resultados else None 
             
@@ -113,16 +117,17 @@ def get_exchanges():
 
                 resultados[crypto] = data
 
-                print(f"JSON para {crypto}: {resultados[crypto]}")
+                #print(f"JSON para {crypto}: {resultados[crypto]}")
+                logger.info("Extraccion de Información para ex changes")
             else:
                 logger.error(f"Error {response.status_code} para {crypto}")
 
-            time.sleep(1.5)  # evita 429 (rate limit)
+            time.sleep(15)  # evita 429 (rate limit)
 
         return resultados if resultados else None
         
     except Exception as e:
-            print(f"Ocurrió un error inesperado: {e}")
+            logger.error(f"Ocurrió un error inesperado: {e}")
 
 # Función para obtener el historial de mercado
 def get_market_history():
@@ -155,20 +160,20 @@ def get_market_history():
             
                 #Para debug ver los resultados 
                 #print(f"JSON para {crypto}: {resultados[crypto]}")
-                print(f"{crypto} → precios cargados: {contador}")
+                #print(f"{crypto} → precios cargados: {contador}")
+
+                logger.info("Extraccion de Información para el market history")
             
-                time.sleep(1.5)  # evitar 429
             
             elif response_market.status_code == 429:
-                logger.warning(
-                    f"Rate limit alcanzado para {crypto}, esperando..."
-                )
-                time.sleep(5)
+                logger.warning(f"Rate limit alcanzado para {crypto}, esperando...")
+                
+                time.sleep(20) # Espera más tiempo si hay rate limit
 
             else:
-                logger.error(
-                    f"Error {response_market.status_code} al obtener market de {crypto}"
-                )
+                logger.error(f"Error {response_market.status_code} al obtener market de {crypto}")
+
+                time.sleep(22)  # evitar 429
 
         return resultados if resultados else None
     except requests.exceptions.Timeout:
@@ -194,6 +199,7 @@ def get_trending():
                 print(f"ID: {coin['id']}")
                 position += 1
 
+            time.sleep(10)  # Delay después de obtener trending
             return trending_data
         else:
             print(f"Error en la API de tendencias: {response_trending.status_code}")
@@ -202,37 +208,16 @@ def get_trending():
     except Exception as e:
         logger.error(f"Ocurrió un error inesperado: {e}")
 
-# Función para obtener datos globales del mercado
-def get_global_market():
-    try:
-        response_market_global = requests.get(API_MARKET_GLOBAL, headers=HEADERS, timeout=10)
-        
-        if response_market_global.status_code == 200:
 
-            logger.info("Global market extraído")
-            data_global = response_market_global.json()
-            print(f"La data global es: \n {data_global}")
-            time_now = datetime.now(timezone.utc)
-            print(f"El tiempo actual es : {time_now}")
-
-            return data_global
-        
-        else:
-            print(f"Error global market: {response_market_global.status_code}")
-    except requests.exceptions.Timeout:
-        logger.error("Error: La solicitud ha superado el tiempo de espera")
-    except Exception as e:
-        logger.error(f"Ocurrió un error inesperado: {e}")
 
 # Función principal para llamar todas las funciones
 def extract_data():
     return {
-        #"prices": get_prices(),
-        #"details": get_details(),
-        #"exchanges": get_exchanges(),
-        #"market_history": get_market_history(),
-        #"trending": get_trending(),
-        #"global_market": get_global_market()
+        "prices": get_prices(),
+        "details": get_details(),
+        "exchanges": get_exchanges(),
+        "market_history": get_market_history(),
+        "trending": get_trending()
     }
 
 # Ejecutar el script
