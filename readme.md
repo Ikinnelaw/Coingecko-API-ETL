@@ -1,3 +1,4 @@
+
 # **Crypto Tracker - ETL Pipeline Batch**
 
 Pipeline ETL por lotes (Batch Processing) que extrae, procesa y almacena datos de criptomonedas desde la API de CoinGecko en una base de datos MySQL.
@@ -20,11 +21,11 @@ El sistema recopila información completa sobre Bitcoin, Ethereum y Tether, incl
 
 ### Datos Recopilados:
 
-**Precios:** en tiempo real en USD, EUR y MXN
+**Precios:** en tiempo real en USD, EUR y MXN  
 Market Cap y Volumen de las últimas 24 horas Cambios porcentuales del mercado  
-**Detalles técnicos:** ( categorías , plataforma de block chain , posición de la moneda segun su capitalización de mercado )
+**Detalles técnicos:** ( categorías , plataforma de block chain , posición de la moneda segun su capitalización de mercado )  
 **Información de exchanges :** (5 exchanges principales por cripto)  
-**Historial de mercado :** (últimos 30 días)  
+**Historial de mercado :** (últimos 30 días)    
 **Trending :** (Top 10 criptomonedas más populares)
 
 
@@ -102,12 +103,15 @@ Ejecutar los siguientes comandos si usa Linux (si utiliza un entorno Vritual ), 
 ### Logs 
 El sistema genera logs automáticos en Logs/coingecko-api.log con:  
 
-Timestamp de cada ejecución  
-Éxitos y errores en la extracción  
+``` bash
+Timepo de ejecución (Timestamp) de cada función   
+Éxitos y errores en la extracción de la data 
 Número de registros insertados  
-Warnings de rate limits 
- 
+Warnings de rate limits
+Error en caso de algun error en la extracción , transformación o en insertar la data en la BD 
+```
 ## Authors
 
 - Erick DZ
 - Mi perfil de github es : [@Ikinnelaw](https://github.com/Ikinnelaw)
+
